@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 class UserController extends BaseApiController
 {
-    public function __construct(protected UserRepository $userRepository)
+    public function __construct(protected UserRepository  $userRepository)
     {
     }
 
