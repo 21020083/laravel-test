@@ -122,6 +122,10 @@
       <path value="$PROJECT_DIR$/example-app/vendor/symfony/var-dumper" />
       <path value="$PROJECT_DIR$/example-app/vendor/symfony/yaml" />
       <path value="$PROJECT_DIR$/example-app/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/example-app/vendor/symfony/mailgun-mailer" />
+      <path value="$PROJECT_DIR$/example-app/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/example-app/vendor/symfony/http-client" />
+      <path value="$PROJECT_DIR$/example-app/vendor/resend/resend-php" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">

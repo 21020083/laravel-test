@@ -92,9 +92,12 @@
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/event-dispatcher" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/event-dispatcher-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/http-client-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/http-foundation" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/http-kernel" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/mailer" />
+      <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/mailgun-mailer" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/mime" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/polyfill-ctype" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/symfony/polyfill-intl-grapheme" />
@@ -120,6 +123,7 @@
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/webmozart/assert" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/example-app/vendor/resend/resend-php" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

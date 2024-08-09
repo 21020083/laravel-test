@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Requests\user\ShowUserRequest;
-use app\Http\Requests\user\StoreUserRequest;
-use app\Http\Requests\user\UpdateUserRequest;
-use App\Http\Requests\user\UserSearchRequest;
+use App\Http\Requests\user\StoreUserRequest;
+use App\Http\Requests\user\user\ShowUserRequest;
+
+use App\Http\Requests\user\user\UpdateUserRequest;
+use App\Http\Requests\user\user\UserSearchRequest;
 use App\Http\Resources\UserBasicResource;
 use App\Models\User;
 use App\Repositories\UserRepository;

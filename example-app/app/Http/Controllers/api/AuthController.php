@@ -4,11 +4,16 @@ namespace App\Http\Controllers\api;
 
 use App\Common\StatusConst;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\auth\ForgotPasswordRequest;
-use App\Http\Requests\auth\LoginRequest;
-use App\Http\Requests\auth\ResetPasswordRequest;
+use App\Http\Requests\user\auth\ForgotPasswordRequest;
+use App\Http\Requests\user\auth\LoginRequest;
+use App\Http\Requests\user\auth\RegisterRequest;
+use App\Http\Requests\user\auth\ResetPasswordRequest;
+use App\Http\Requests\user\StoreUserRequest;
 use App\Http\Resources\UserBasicResource;
+use App\Mail\ResetPasswordMail;
+use App\Models\ResetPassword;
 use App\Models\User;
+use App\Notifications\ResetPasswordNoti;
 use App\Repositories\ResetPasswordRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
@@ -16,10 +21,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
 
 class AuthController extends BaseApiController
 {
     //
+
     public function __construct(
         protected UserRepository          $userRepository,
         protected ResetPasswordRepository $resetPasswordRepository)
@@ -51,53 +60,66 @@ class AuthController extends BaseApiController
 
         return $this->sendError('Thông tin đăng nhập không chính xác');
     }
+
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $this->userRepository->create([
+            'name' => $data['name'],
+            'username' => $data['username'],
+            'password' => Hash::make($data['password']),
+            'email' => $data['email'],
+        ]);
+
+        return $this->sendResponse($data, __('common.register_successful'));
+
+    }
     public function logout(Request $request): JsonResponse
     {
         $user = $request->user();
         $user->currentAccessToken()->delete();
-        return $this->sendResponse(null, __('common.logout_successful'));
-    }
-    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
-    {
-        $data = $request->validated();
-        $user = $this->userRepository->findByCondition([
-            'username' => $data['username']
-        ])->first();
-        if ($user) {
-            if(!$user->tokens()->where('name', 'reset_password')->exists()){
-                $user->createToken('reset_password')->plainTextToken;
-            }
-            $result = ['reset_password_token' => $user->tokens()];
-            return $this->sendResponse($user->tokens, __('common.forgot_password_successful'));
-        }
-
-        return $this->sendError(__('common.forgot_password_failed'));
+        return $this->sendResponse($user, __('common.logout_successful'));
     }
 
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    public function sendMail(Request $request): JsonResponse
     {
-        $data = $request->validated();
+        $user = User::where('email', $request->email)->firstOrFail();
 
-        $user = $this->resetPasswordRepository->findByCondition([
-            'email' => $data['email']
-        ])->first();
+        $mailData = ['email' => $user->email, 'token' => rand(100000, 1000000)];
 
-        if (!$user) {
-            return $this->sendError(__('common.forgot_password_failed'));
-        }
-
-        $this->userRepository->update($user->id, [
-            'password' => Hash::make($data['new_password'])
+        $passwordReset = ResetPassword::updateOrCreate([
+            'email' => $mailData['email'],
+        ], [
+            'token' => $mailData['token'],
         ]);
 
-        $this->resetPasswordRepository->deleteBy(
-            [
-                'token' => $data['token']
-            ]
-        );
+        if ($passwordReset) {
+           Mail::to($mailData['email'])->send(new ResetPasswordMail($mailData));
+        }
 
-        return $this->sendResponse(null, __('common.forgot_password_successful'));
+        return $this->sendResponse($passwordReset, 'check mail');
     }
+    public function reset(ForgotPasswordRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $passwordReset = ResetPassword::
+         where('token', $data['code'])
+        ->where('email', $data['email'])
+        ->firstOrFail();
+//        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
+//            $passwordReset->delete();
+//
+//            return response()->json([
+//                'message' => 'This password reset token is invalid.',
+//            ], 422);
+//        }
+        $user = User::where('email', $passwordReset->email)->firstOrFail();
+        $updatePasswordUser = $user->update(['password' => $data['new_password']]);
+        $passwordReset->delete();
 
+        return response()->json([
+            'success' => $updatePasswordUser,
+        ]);
+    }
 
 }

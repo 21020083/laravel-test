@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Requests\user;
+namespace App\Http\Requests\user;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +23,6 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'address' => 'required|string',
             'username' => [
                 'required',
                 'string',

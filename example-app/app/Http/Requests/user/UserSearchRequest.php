@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\user;
+namespace App\Http\Requests\user\user;
 
 use App\Common\RoleConst;
 use Illuminate\Foundation\Http\FormRequest;

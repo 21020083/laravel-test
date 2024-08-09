@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\auth;
+namespace App\Http\Requests\user\auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class ForgotPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,10 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required',
-            'password' => 'required',
+            'email' => 'required|email',
+            'code' => 'required',
+            'new_password'=> 'required',
+            'confirm_password' => 'required|same:new_password',
         ];
     }
 }
