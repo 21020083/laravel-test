@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
-Route::post('forgot-password', [AuthController::class, 'sendMail']);
+Route::post('forgot-password', [AuthController::class, 'sendMailForgotPassword']);
 Route::post('reset-password', [AuthController::class, 'reset']);
 Route::post('register', [AuthController::class, 'register']);
 

@@ -64,12 +64,7 @@ class AuthController extends BaseApiController
     public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $this->userRepository->create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'password' => Hash::make($data['password']),
-            'email' => $data['email'],
-        ]);
+        $this->userRepository->create($data);
 
         return $this->sendResponse($data, __('common.register_successful'));
 
@@ -81,7 +76,7 @@ class AuthController extends BaseApiController
         return $this->sendResponse($user, __('common.logout_successful'));
     }
 
-    public function sendMail(Request $request): JsonResponse
+    public function sendMailForgotPassword(Request $request): JsonResponse
     {
         $user = User::where('email', $request->email)->firstOrFail();
 
@@ -102,24 +97,27 @@ class AuthController extends BaseApiController
     public function reset(ForgotPasswordRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $passwordReset = ResetPassword::
-         where('token', $data['code'])
-        ->where('email', $data['email'])
-        ->firstOrFail();
-//        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
-//            $passwordReset->delete();
-//
-//            return response()->json([
-//                'message' => 'This password reset token is invalid.',
-//            ], 422);
-//        }
-        $user = User::where('email', $passwordReset->email)->firstOrFail();
-        $updatePasswordUser = $user->update(['password' => $data['new_password']]);
-        $passwordReset->delete();
+        $passwordReset = $this->resetPasswordRepository->findByCondition([
+            'email' => $data['email'],
+            'token' => $data['code'],
+        ])->first();
 
-        return response()->json([
-            'success' => $updatePasswordUser,
-        ]);
+        if($passwordReset){
+            if (Carbon::parse($passwordReset->updated_at)->addMinutes(15)->isPast()) {
+                $passwordReset->delete();
+
+                return $this->sendError('this code has expired', 422);
+            }
+
+            $user = $this->userRepository->findByCondition(['email' => $data['email']])->first();
+            $user->update( ['password' => Hash::make($data['new_password'])] );
+
+            $passwordReset->delete();
+
+            return $this->sendResponse($user,'success');
+        }
+
+        return $this->sendError('wrong email or reset-password code');
     }
 
 }
